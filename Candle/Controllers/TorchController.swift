@@ -30,7 +30,9 @@ final class TorchController: ObservableObject {
         isRunning = true
         UIApplication.shared.isIdleTimerDisabled = true
         timer = Timer.scheduledTimer(withTimeInterval: tickInterval, repeats: true) { [weak self] _ in
-            self?.tick()
+            MainActor.assumeIsolated {
+                self?.tick()
+            }
         }
     }
 
@@ -38,6 +40,7 @@ final class TorchController: ObservableObject {
         timer?.invalidate()
         timer = nil
         isRunning = false
+        wasRunningBeforeBackground = false
         UIApplication.shared.isIdleTimerDisabled = false
         setTorch(level: nil)
     }
@@ -51,8 +54,8 @@ final class TorchController: ObservableObject {
             }
         case .inactive, .background:
             if isRunning {
-                wasRunningBeforeBackground = true
                 stop()
+                wasRunningBeforeBackground = true
             }
         @unknown default:
             break
