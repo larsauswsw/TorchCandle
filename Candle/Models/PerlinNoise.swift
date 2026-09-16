@@ -28,7 +28,7 @@ struct PerlinNoise {
         let d0 = g0 * xf
         let d1 = g1 * (xf - 1)
 
-        return lerp(d0, d1, fade)
+        return lerp(d0, d1, fade) * 2.0
     }
 
     private func gradient(_ hash: Int) -> Double {
