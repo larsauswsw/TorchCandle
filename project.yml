@@ -16,11 +16,14 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: de.lars-miesner.candle
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        INFOPLIST_KEY_CFBundleDisplayName: Candle
+        INFOPLIST_KEY_CFBundleDisplayName: FelixCandle
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: XDKGU98Z87
   CandleTests:
     type: bundle.unit-test
     platform: iOS
