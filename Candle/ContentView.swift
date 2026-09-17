@@ -14,6 +14,14 @@ struct ContentView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
 
+            VStack(spacing: 4) {
+                Text("Intensität: \(Int(controller.intensity * 100))%")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                Slider(value: $controller.intensity, in: 0...1)
+                    .padding(.horizontal)
+            }
+
             Button(action: toggle) {
                 VStack(spacing: 12) {
                     Image(systemName: controller.isRunning ? "flame.fill" : "flame")
