@@ -13,11 +13,9 @@ final class TorchController: ObservableObject {
     private var timer: Timer?
     private var noise = PerlinNoise()
     private var t: Double = 0
-    private var dipTicksRemaining = 0
     private var wasRunningBeforeBackground = false
 
     private let tickInterval: TimeInterval = 0.05
-    private let dipLevel: Float = 0.05
 
     init() {
         let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
@@ -64,20 +62,8 @@ final class TorchController: ObservableObject {
 
     private func tick() {
         t += preset.timeStep
-        var level: Float
-
-        if dipTicksRemaining > 0 {
-            dipTicksRemaining -= 1
-            level = dipLevel
-        } else {
-            let noiseValue = noise.value(at: t)
-            level = preset.level(forNoise: noiseValue)
-            if preset.dipChance > 0, Double.random(in: 0...1) < preset.dipChance {
-                dipTicksRemaining = 1
-                level = dipLevel
-            }
-        }
-
+        let noiseValue = noise.value(at: t)
+        let level = preset.level(forNoise: noiseValue)
         setTorch(level: level)
     }
 
