@@ -32,7 +32,7 @@ final class FlickerPresetTests: XCTestCase {
         let preset = FlickerPreset(name: "Test", minLevel: 0.2, maxLevel: 0.9, timeStep: 0.05)
         for noise in [-1.0, -0.5, 0.0, 0.5, 1.0] {
             let plain = preset.level(forNoise: noise)
-            let scaled = preset.scaledLevel(forNoise: noise, intensity: 1.0, floor: 0.0)
+            let scaled = preset.scaledLevel(forNoise: noise, intensity: 1.0, minimumLevel: 0.0)
             XCTAssertEqual(scaled, plain, accuracy: 0.0001)
         }
     }
@@ -41,7 +41,7 @@ final class FlickerPresetTests: XCTestCase {
         let preset = FlickerPreset(name: "Test", minLevel: 0.2, maxLevel: 0.8, timeStep: 0.05)
         let mean: Float = 0.5
         for noise in [-1.0, -0.5, 0.0, 0.5, 1.0] {
-            let scaled = preset.scaledLevel(forNoise: noise, intensity: 0.0, floor: 0.0)
+            let scaled = preset.scaledLevel(forNoise: noise, intensity: 0.0, minimumLevel: 0.0)
             XCTAssertEqual(scaled, mean, accuracy: 0.0001)
         }
     }
@@ -51,20 +51,32 @@ final class FlickerPresetTests: XCTestCase {
         let floor: Float = 0.15
         for intensity in [0.0, 0.25, 0.5, 0.75, 1.0] {
             for noise in [-1.0, -0.75, -0.5, 0.0, 0.5, 0.75, 1.0] {
-                let scaled = preset.scaledLevel(forNoise: noise, intensity: intensity, floor: floor)
+                let scaled = preset.scaledLevel(forNoise: noise, intensity: intensity, minimumLevel: floor)
                 XCTAssertGreaterThanOrEqual(scaled, floor)
+            }
+        }
+    }
+
+    func test_scaledLevelNeverFallsBelowFloorForRealPresets() {
+        let floor: Float = 0.15
+        for preset in FlickerPreset.all {
+            for intensity in [0.0, 0.25, 0.5, 0.75, 1.0] {
+                for noise in [-1.0, -0.5, 0.0, 0.5, 1.0] {
+                    let scaled = preset.scaledLevel(forNoise: noise, intensity: intensity, minimumLevel: floor)
+                    XCTAssertGreaterThanOrEqual(scaled, floor)
+                }
             }
         }
     }
 
     func test_scaledLevelClampsOutOfRangeIntensity() {
         let preset = FlickerPreset(name: "Test", minLevel: 0.2, maxLevel: 0.8, timeStep: 0.05)
-        let atOne = preset.scaledLevel(forNoise: 1.0, intensity: 1.0, floor: 0.0)
-        let above = preset.scaledLevel(forNoise: 1.0, intensity: 5.0, floor: 0.0)
+        let atOne = preset.scaledLevel(forNoise: 1.0, intensity: 1.0, minimumLevel: 0.0)
+        let above = preset.scaledLevel(forNoise: 1.0, intensity: 5.0, minimumLevel: 0.0)
         XCTAssertEqual(above, atOne, accuracy: 0.0001)
 
-        let atZero = preset.scaledLevel(forNoise: 1.0, intensity: 0.0, floor: 0.0)
-        let below = preset.scaledLevel(forNoise: 1.0, intensity: -5.0, floor: 0.0)
+        let atZero = preset.scaledLevel(forNoise: 1.0, intensity: 0.0, minimumLevel: 0.0)
+        let below = preset.scaledLevel(forNoise: 1.0, intensity: -5.0, minimumLevel: 0.0)
         XCTAssertEqual(below, atZero, accuracy: 0.0001)
     }
 }

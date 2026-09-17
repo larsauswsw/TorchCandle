@@ -15,11 +15,20 @@ struct ContentView: View {
             .padding(.horizontal)
 
             VStack(spacing: 4) {
-                Text("Intensität: \(Int(controller.intensity * 100))%")
+                Text("Intensität: \(Int((controller.intensity * 100).rounded()))%")
                     .font(.footnote)
                     .foregroundColor(.secondary)
-                Slider(value: $controller.intensity, in: 0...1)
-                    .padding(.horizontal)
+                Slider(
+                    value: $controller.intensity,
+                    in: 0...1,
+                    onEditingChanged: { isEditing in
+                        if !isEditing {
+                            controller.persistIntensity()
+                        }
+                    }
+                )
+                .accessibilityLabel("Intensität")
+                .padding(.horizontal)
             }
 
             Button(action: toggle) {
