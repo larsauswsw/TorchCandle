@@ -7,6 +7,11 @@ import UIKit
 final class TorchController: ObservableObject {
     @Published private(set) var isRunning = false
     @Published var preset: FlickerPreset = .normal
+    @Published var intensity: Double = 1.0 {
+        didSet {
+            UserDefaults.standard.set(intensity, forKey: TorchController.intensityDefaultsKey)
+        }
+    }
     @Published private(set) var isTorchAvailable: Bool
 
     private let device: AVCaptureDevice?
@@ -15,12 +20,17 @@ final class TorchController: ObservableObject {
     private var t: Double = 0
     private var wasRunningBeforeBackground = false
 
+    private static let intensityDefaultsKey = "flickerIntensity"
     private let tickInterval: TimeInterval = 0.05
+    private let floorLevel: Float = 0.15
 
     init() {
         let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
         self.device = device
         self.isTorchAvailable = device?.hasTorch ?? false
+        if UserDefaults.standard.object(forKey: TorchController.intensityDefaultsKey) != nil {
+            self.intensity = UserDefaults.standard.double(forKey: TorchController.intensityDefaultsKey)
+        }
     }
 
     func start() {
@@ -63,7 +73,7 @@ final class TorchController: ObservableObject {
     private func tick() {
         t += preset.timeStep
         let noiseValue = noise.value(at: t)
-        let level = preset.level(forNoise: noiseValue)
+        let level = preset.scaledLevel(forNoise: noiseValue, intensity: intensity, floor: floorLevel)
         setTorch(level: level)
     }
 
