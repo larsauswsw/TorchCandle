@@ -10,11 +10,13 @@ struct FlickerPreset: Hashable {
         return minLevel + t * (maxLevel - minLevel)
     }
 
-    func scaledLevel(forNoise noise: Double, intensity: Double, minimumLevel: Float) -> Float {
+    func scaledLevel(forNoise noise: Double, intensity: Double, brightness: Double, minimumLevel: Float) -> Float {
         let baseLevel = level(forNoise: noise)
         let mean = (minLevel + maxLevel) / 2
         let clampedIntensity = Float(max(0.0, min(1.0, intensity)))
-        let scaled = mean + (baseLevel - mean) * clampedIntensity
+        let clampedBrightness = Float(max(0.0, min(1.0, brightness)))
+        let scaledMean = mean * clampedBrightness
+        let scaled = scaledMean + (baseLevel - mean) * clampedIntensity
         return max(minimumLevel, scaled)
     }
 

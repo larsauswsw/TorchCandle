@@ -31,6 +31,23 @@ struct ContentView: View {
                 .padding(.horizontal)
             }
 
+            VStack(spacing: 4) {
+                Text("Helligkeit: \(Int((controller.brightness * 100).rounded()))%")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                Slider(
+                    value: $controller.brightness,
+                    in: 0...1,
+                    onEditingChanged: { isEditing in
+                        if !isEditing {
+                            controller.persistBrightness()
+                        }
+                    }
+                )
+                .accessibilityLabel("Helligkeit")
+                .padding(.horizontal)
+            }
+
             Button(action: toggle) {
                 VStack(spacing: 12) {
                     Image(systemName: controller.isRunning ? "flame.fill" : "flame")
